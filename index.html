@@ -138,7 +138,7 @@
 		function drawScore(){
 			ctx.font = "16px Verdana";
 			ctx.fillstyle = "#000000"
-			ctx.fillText('Points: ' + score , 8, 20);
+			ctx.fillText('Points: ' + score , 28, 20);
 		}
 		
 		function drawBall(){
@@ -190,24 +190,25 @@
 			}
 			ctx.font = "16px Verdana";
 			ctx.fillstyle = "#000000"
-			ctx.fillText('Time: ' + time , 100, 20);
+			ctx.fillText('Time: ' + time , 120, 20);
 		}
 			
 		function draw(){
 			ctx.clearRect(0,0,canvas.width,canvas.height);
+			
 			ctx.font = "16px Verdana";
 			ctx.fillStyle = "#000000";
-			ctx.fillText("Made by Boris Bakulin 2023", 550, 20);
-			
+			ctx.fillText("Made by Boris Bakulin 2023", 769, 20);
+
 			if (boostCounter ===1){
 				ctx.font = "16px Verdana";
-				ctx.fillStyle = "#000000";
-				ctx.fillText('Press SPACE for boost (once a game)' ,190, 20);
+				ctx.fillstyle = "#000000";
+				ctx.fillText('Press SPACE for boost (once a game)' ,210, 20);
 			}
 			if (boostStatus === true){
 				ctx.font = "16px Verdana";
-				ctx.fillStyle = "#000000";
-				ctx.fillText('!!!!BOOSTING!!!!' ,190, 20);
+				ctx.fillstyle = "#000000";
+				ctx.fillText('!!!!BOOSTING!!!!' ,210, 20);
 			}
 			
 			drawBall();
