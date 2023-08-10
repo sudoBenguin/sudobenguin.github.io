@@ -195,14 +195,18 @@
 			
 		function draw(){
 			ctx.clearRect(0,0,canvas.width,canvas.height);
+			ctx.font = "16px Verdana";
+			ctx.fillStyle = "#000000";
+			ctx.fillText("Made by Boris Bakulin 2023", 500, 20);
+			
 			if (boostCounter ===1){
 				ctx.font = "16px Verdana";
-				ctx.fillstyle = "#000000";
+				ctx.fillStyle = "#000000";
 				ctx.fillText('Press SPACE for boost (once a game)' ,180, 20);
 			}
 			if (boostStatus === true){
 				ctx.font = "16px Verdana";
-				ctx.fillstyle = "#000000";
+				ctx.fillStyle = "#000000";
 				ctx.fillText('!!!!BOOSTING!!!!' ,180, 20);
 			}
 			
