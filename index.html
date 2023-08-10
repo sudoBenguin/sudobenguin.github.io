@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8" />
+		<title>paddleton</title>
+		<style>
+			* {
+			  padding: 0;
+			  margin: 0;
+			}
+			canvas {
+				background: #e1e6db;
+				display: block;
+				margin: 0 auto;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id = "myCanvas" width = "1000" height = "500"></canvas>
+		<script>
+		
+		
+		const canvas = document.getElementById("myCanvas");
+		const ctx = canvas.getContext("2d");
+		const paddleHeight = 10;
+		const paddleWidth = 100;
+		let paddleX = (canvas.width - paddleWidth) / 2;
+		
+		let rightPressed = false;
+		let leftPressed = false;
+		
+	
+
+		const brickRowCount = 5;
+		const brickColumnCount = 11;
+		const brickWidth = 75;
+		const brickHeight = 20;
+		const brickPadding = 10
+		const brickOffsetTop = 30;
+		const brickOffsetLeft = 30;
+		
+		let time = 0
+		let timeCounter = 0
+
+		const ballRadius = 10;
+		let x = canvas.width/2;
+		let y = canvas.height - 30;
+		let color = getRandomColor()
+		let dx = Math.floor(Math.random()*4);
+		let dy = -2;
+		let score = 0;
+		
+		let boostCounter = 1;
+		let boostStartTime = 0;
+		let boostStatus = false;
+
+		const bricks = [];
+		for (let c = 0; c<brickColumnCount; c++) {
+			bricks[c] = []
+			for (let r=0; r< brickRowCount; r++){
+				bricks[c][r] = {x : 0, y:0, status : 1};
+			}
+		}
+		document.documentElement.style.cursor = 'none';
+		document.addEventListener("keydown", keyDownHandler, false);
+		document.addEventListener("keyup", keyUpHandler, false);
+		document.addEventListener("mousemove", mouseMoveHandler, false);
+		
+
+		function getRandomColor() {
+        	var letters = '0123456789ABCDEF'.split('');
+        	var color = '#';
+        	for (var i = 0; i < 6; i++ ) {
+            	color += letters[Math.round(Math.random() * 15)];
+        	}
+        	return color;
+    	}
+
+		function mouseMoveHandler(e) {
+  			var relativeX = e.clientX - canvas.offsetLeft;
+  			if(relativeX > 0 && relativeX < canvas.width) {
+   				 paddleX = relativeX - paddleWidth/2;
+  			}
+		}
+
+		function keyDownHandler(e) {
+			if (e.key === "Right" || e.key === "ArrowRight") {
+				rightPressed = true;
+				
+			} 
+			else if (e.key === "Left" || e.key === "ArrowLeft") {
+				leftPressed = true;
+			}
+			else if (e.keyCode === 32 || e.key === " " || e.code === "Space"){
+				if (boostCounter === 1) {
+					boostStatus = true;
+					boostStartTime = time;
+					boostCounter = 0;
+				}
+			}
+		}
+
+		
+		function keyUpHandler(e) {
+			if (e.key === "Right" || e.key === "ArrowRight") {
+				rightPressed = false;
+				
+			} else if (e.key === "Left" || e.key === "ArrowLeft") {
+				leftPressed = false;
+			}
+		}
+		
+		function collisionDetection() {
+			for (let c=0;c<brickColumnCount; c++) {
+				for (let r = 0; r< brickRowCount; r++) {
+					const b = bricks [c][r];
+					if (b.status === 1){
+						if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
+							if (boostStatus === false){
+								dy = -dy;
+							}
+							b.status = 0;
+							color = getRandomColor();
+							score++;
+							if (score === brickColumnCount * brickRowCount) {
+								document.documentElement.style.cursor = 'auto';
+								alert("Nice Job, you won with a time of " + time + " seconds. Average: " + Math.round(10*(score/time))/10 + "hps")
+								document.location.reload();
+								clearInterval(interval);
+							}
+						}
+
+					}
+				}
+			}
+		}
+
+		function drawScore(){
+			ctx.font = "16px Verdana";
+			ctx.fillstyle = "#000000"
+			ctx.fillText('Points: ' + score , 8, 20);
+		}
+		
+		function drawBall(){
+			ctx.beginPath();
+			ctx.arc(x,y,ballRadius, 0, Math.PI*2);
+			ctx.fillStyle = color;
+			ctx.fill();
+			ctx.closePath();
+		}
+
+		function drawPaddle() {
+			ctx.beginPath();
+			ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
+			ctx.fillStyle = "#000000";
+			ctx.fill();
+			ctx.closePath();
+		}
+
+		function drawBricks() {
+			for(let c=0;c<brickColumnCount;c++) {
+				for(let r=0; r<brickRowCount; r++) {
+					if(bricks[c][r].status == 1){
+						var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+						var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+						bricks[c][r].x = brickX;
+						bricks[c][r].y = brickY;
+						ctx.beginPath();
+						ctx.rect(brickX, brickY, brickWidth, brickHeight);
+						ctx.fillStyle = "#000000"
+						ctx.fill();
+						ctx.closePath();
+					}
+				}
+			}
+		}
+	
+		function drawTime(){
+			
+			timeCounter += 1;
+			if(timeCounter === 100) {
+				time += 1
+				timeCounter = 0
+			}
+			
+			if (boostStatus === true){
+				if (boostStartTime-time===-5){
+					boostStatus = false;
+				}
+			}
+			ctx.font = "16px Verdana";
+			ctx.fillstyle = "#000000"
+			ctx.fillText('Time: ' + time , 100, 20);
+		}
+			
+		function draw(){
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			if (boostCounter ===1){
+				ctx.font = "16px Verdana";
+				ctx.fillstyle = "#000000";
+				ctx.fillText('Press SPACE for boost (once a game)' ,180, 20);
+			}
+			if (boostStatus === true){
+				ctx.font = "16px Verdana";
+				ctx.fillstyle = "#000000";
+				ctx.fillText('!!!!BOOSTING!!!!' ,180, 20);
+			}
+			
+			drawBall();
+			drawBricks();
+			drawPaddle();
+			drawScore();
+			collisionDetection();
+			drawTime();
+
+			if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+				
+				dx = -dx;
+				color = getRandomColor();
+			}
+
+			if (y + dy<ballRadius) {
+				
+				dy = -dy;
+				color = getRandomColor();
+			}
+			else if (y + dy > canvas.height - ballRadius) {
+				if (x > paddleX + 1 && x < paddleX + paddleWidth + 1){
+					dy = -dy;
+					if (dx<0){
+						dx = -(Math.floor(Math.random()*4)) -1;	
+					}
+					else{
+						dx = Math.floor(Math.random()*4)+1;
+					}
+					
+                    color = getRandomColor();
+				}
+				
+				else {
+					document.documentElement.style.cursor = 'auto';
+					alert("Imagine losing");
+					document.location.reload();
+					clearInterval(interval);
+				}
+			
+			}
+			
+			if (leftPressed) {
+				paddleX = Math.max(paddleX - 7, 0);
+			}
+			else if (rightPressed) {
+				paddleX = Math.min(paddleX + 7, canvas.width - paddleWidth);
+			}
+			x += dx;
+			y += dy;
+		}
+				
+		const interval = setInterval(draw, 9);
+		</script>
+	</body>
+</html>
